@@ -11,11 +11,17 @@ Features:
   - Model metrics summary
 """
 
+import sys
 import json
 import time
 import pickle
 from pathlib import Path
 from typing import Optional
+
+# Ensure project root is in sys.path so 'src' can be imported from anywhere
+ROOT_DIR = Path(__file__).resolve().parent.parent
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
 
 import numpy as np
 import pandas as pd
@@ -29,8 +35,8 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-MODELS_DIR = Path("models")
-DATA_DIR = Path("data/raw")
+MODELS_DIR = ROOT_DIR / "models"
+DATA_DIR = ROOT_DIR / "data/raw"
 
 # ---- Helpers ----
 

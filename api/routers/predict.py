@@ -4,10 +4,15 @@ Prediction endpoints — /predict/rul and /predict/anomaly.
 Models are loaded lazily at first request and cached in module state.
 """
 
+import sys
 import logging
 import pickle
 from pathlib import Path
 from typing import Optional
+
+ROOT_DIR = Path(__file__).resolve().parent.parent.parent
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
 
 import numpy as np
 import pandas as pd
@@ -18,7 +23,7 @@ from api.schemas import RULRequest, RULResponse, AnomalyRequest, AnomalyResponse
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
-MODELS_DIR = Path("models")
+MODELS_DIR = ROOT_DIR / "models"
 
 # --- Lazy-loaded singletons ------------------------------------------------
 _preprocessor = None
