@@ -169,11 +169,18 @@ if page == "📊 Fleet Overview":
 
     # Fleet table
     st.subheader("Engine Fleet Status")
+    def _color_rul(val):
+        try:
+            return f"color: {rul_color(float(val))}; font-weight: bold;"
+        except Exception:
+            return "color: white;"
+
+    # Pandas 2.2+ uses .map(), older versions used .applymap()
+    style_method = getattr(result_df.style, "map", None) or getattr(result_df.style, "applymap", None)
+    styled_df = style_method(_color_rul, subset=["Predicted RUL"]) if style_method else result_df
+
     st.dataframe(
-        result_df.style.applymap(
-            lambda v: f"color: {rul_color(float(v.split()[0])) if v[0].isdigit() else 'white'}",
-            subset=["Predicted RUL"]
-        ),
+        styled_df,
         use_container_width=True,
         height=400,
     )
