@@ -130,11 +130,6 @@ class CMAPSSPreprocessor:
         for col in SENSOR_COLS:
             if col not in df.columns:
                 continue
-            rolled = df.groupby("unit_id")[col].transform(
-                lambda s: s.rolling(self.window, min_periods=1)
-            )
-            new_cols[f"{col}_mean"] = rolled.mean() if hasattr(rolled, "mean") else rolled
-            # Rolling returns a GroupBy-transformed series — apply correctly
             new_cols[f"{col}_mean"] = df.groupby("unit_id")[col].transform(
                 lambda s: s.rolling(self.window, min_periods=1).mean()
             )

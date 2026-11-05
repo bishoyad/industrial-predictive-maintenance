@@ -51,37 +51,51 @@ class BaseRULModel(ABC):
 
 class XGBoostRUL(BaseRULModel):
     """
-    XGBoost regressor for RUL prediction.
+    Gradient-boosted trees regressor for RUL prediction.
+    Uses XGBoost if available; gracefully falls back to Scikit-Learn's
+    HistGradientBoostingRegressor if libomp (OpenMP) is missing on macOS.
     Flattens the [samples, timesteps, features] array before fitting.
     """
 
-    def __init__(self, **xgb_kwargs):
+    def __init__(self, **kwargs):
         try:
             from xgboost import XGBRegressor
-        except ImportError:
-            raise ImportError("Install xgboost: pip install xgboost")
-
-        defaults = dict(
-            n_estimators=400,
-            max_depth=6,
-            learning_rate=0.05,
-            subsample=0.8,
-            colsample_bytree=0.8,
-            random_state=42,
-            n_jobs=-1,
-            verbosity=0,
-        )
-        defaults.update(xgb_kwargs)
-        self.model = XGBRegressor(**defaults)
+            defaults = dict(
+                n_estimators=400,
+                max_depth=6,
+                learning_rate=0.05,
+                subsample=0.8,
+                colsample_bytree=0.8,
+                random_state=42,
+                n_jobs=-1,
+                verbosity=0,
+            )
+            defaults.update(kwargs)
+            self.model = XGBRegressor(**defaults)
+        except Exception as e:
+            logger.warning(
+                "XGBoost native library not available (%s). "
+                "Using Scikit-Learn HistGradientBoostingRegressor.",
+                e,
+            )
+            from sklearn.ensemble import HistGradientBoostingRegressor
+            defaults = dict(
+                max_iter=300,
+                max_depth=8,
+                learning_rate=0.05,
+                random_state=42,
+            )
+            defaults.update(kwargs)
+            self.model = HistGradientBoostingRegressor(**defaults)
 
     def _flatten(self, X: np.ndarray) -> np.ndarray:
         """Flatten [N, T, F] → [N, T*F] if 3-D, else pass through."""
         return X.reshape(len(X), -1) if X.ndim == 3 else X
 
     def fit(self, X: np.ndarray, y: np.ndarray) -> "XGBoostRUL":
-        logger.info("Training XGBoostRUL on %d samples …", len(X))
+        logger.info("Training %s on %d samples …", type(self.model).__name__, len(X))
         self.model.fit(self._flatten(X), y)
-        logger.info("XGBoostRUL training complete.")
+        logger.info("RUL model training complete.")
         return self
 
     def predict(self, X: np.ndarray) -> np.ndarray:
