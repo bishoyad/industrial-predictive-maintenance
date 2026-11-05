@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Data raw files (large — download separately)
+data/raw/*.txt
+data/raw/*.zip
+data/processed/
+
+# Trained model artifacts
+models/*.joblib
+models/*.pt
+models/*.pkl
+models/metrics.json
+
+# IDE
+.vscode/
+.idea/
+
+# macOS
+.DS_Store
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Testing
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Streamlit cache
+.streamlit/
