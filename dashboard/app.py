@@ -40,7 +40,6 @@ DATA_DIR = ROOT_DIR / "data/raw"
 
 # ---- Helpers ----
 
-@st.cache_resource
 def load_preprocessor():
     candidates = list(MODELS_DIR.glob("preprocessor_*.pkl"))
     if not candidates:
@@ -48,7 +47,6 @@ def load_preprocessor():
     with open(candidates[0], "rb") as f:
         return pickle.load(f)
 
-@st.cache_resource
 def load_rul_model():
     from src.models.rul import XGBoostRUL, LSTMRul
     xgb = list(MODELS_DIR.glob("rul_xgboost_*.joblib"))
@@ -59,7 +57,6 @@ def load_rul_model():
         return LSTMRul.load(lstm[0])
     return None
 
-@st.cache_resource
 def load_anomaly_model():
     from src.models.anomaly import AnomalyDetector
     cands = list(MODELS_DIR.glob("anomaly_*.joblib"))
@@ -67,7 +64,6 @@ def load_anomaly_model():
         return AnomalyDetector.load(cands[0])
     return None
 
-@st.cache_data
 def load_metrics():
     p = MODELS_DIR / "metrics.json"
     if p.exists():
