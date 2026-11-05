@@ -85,7 +85,14 @@ class XGBoostRUL(BaseRULModel):
                 learning_rate=0.05,
                 random_state=42,
             )
-            defaults.update(kwargs)
+            clean_kwargs = dict(kwargs)
+            if "n_estimators" in clean_kwargs:
+                clean_kwargs["max_iter"] = clean_kwargs.pop("n_estimators")
+            clean_kwargs.pop("subsample", None)
+            clean_kwargs.pop("colsample_bytree", None)
+            clean_kwargs.pop("n_jobs", None)
+            clean_kwargs.pop("verbosity", None)
+            defaults.update(clean_kwargs)
             self.model = HistGradientBoostingRegressor(**defaults)
 
     def _flatten(self, X: np.ndarray) -> np.ndarray:
