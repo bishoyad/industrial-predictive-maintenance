@@ -23,9 +23,11 @@ models/*.pt
 models/*.pkl
 models/metrics.json
 
-# IDE
+# IDE & AI
 .vscode/
 .idea/
+.agents/
+.claude/
 
 # macOS
 .DS_Store
